@@ -1,5 +1,10 @@
 package com.vircarmen.botica.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.vircarmen.botica.dto.ProductoDTO;
 import com.vircarmen.botica.dto.ProductoRequest;
 import com.vircarmen.botica.entity.Categoria;
@@ -7,14 +12,8 @@ import com.vircarmen.botica.entity.EstadoGeneral;
 import com.vircarmen.botica.entity.Producto;
 import com.vircarmen.botica.repository.CategoriaRepository;
 import com.vircarmen.botica.repository.ProductoRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -87,14 +86,17 @@ public class ProductoService {
         productoRepository.save(producto);
     }
 
-    private ProductoDTO mapToDTO(Producto producto) {
-        return new ProductoDTO(
-                producto.getIdProducto(),
-                producto.getNombre(),
-                producto.getCodigoBarras(),
-                producto.getPrecioVenta(),
-                producto.getStockActual(),
-                producto.getCategoria() != null ? producto.getCategoria().getNombre() : null
-        );
-    }
+   private ProductoDTO mapToDTO(Producto producto) {
+    return new ProductoDTO(
+            producto.getIdProducto(),
+            producto.getNombre(),
+            producto.getPresentacion(), // Mapeado a 'descripcion'
+            producto.getCodigoBarras(),
+            producto.getPrecioVenta(),
+            producto.getStockActual(),
+            producto.getStockMinimo(), // Mapeado a 'stockMinimo'
+            producto.getEstado() != null && producto.getEstado().name().equals("A"), // Mapeado a 'activo' (true si es A)
+            producto.getCategoria() != null ? producto.getCategoria().getNombre() : null
+    );
+}
 }

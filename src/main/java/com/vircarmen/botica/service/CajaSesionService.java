@@ -1,5 +1,10 @@
 package com.vircarmen.botica.service;
 
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.vircarmen.botica.dto.CajaSesionCierreRequest;
 import com.vircarmen.botica.dto.CajaSesionDTO;
 import com.vircarmen.botica.dto.CajaSesionRequest;
@@ -7,11 +12,8 @@ import com.vircarmen.botica.entity.CajaSesion;
 import com.vircarmen.botica.entity.Usuario;
 import com.vircarmen.botica.repository.CajaSesionRepository;
 import com.vircarmen.botica.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -58,10 +60,15 @@ public class CajaSesionService {
     }
 
     public CajaSesionDTO obtenerCajaActual(Integer idUsuario) {
-        CajaSesion caja = cajaSesionRepository.findByUsuarioIdUsuarioAndEstado(idUsuario, CajaSesion.EstadoCaja.ABIERTA)
-                .orElseThrow(() -> new RuntimeException("El usuario no tiene una caja abierta actualmente"));
-        return mapToDTO(caja);
-    }
+
+    return cajaSesionRepository
+            .findByUsuarioIdUsuarioAndEstado(
+                    idUsuario,
+                    CajaSesion.EstadoCaja.ABIERTA
+            )
+            .map(this::mapToDTO)
+            .orElse(null);
+}
 
     private CajaSesionDTO mapToDTO(CajaSesion c) {
         return new CajaSesionDTO(

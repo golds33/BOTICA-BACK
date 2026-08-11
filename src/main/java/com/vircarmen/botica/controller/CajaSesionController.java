@@ -39,8 +39,18 @@ public class CajaSesionController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'CAJERO')")
-    @GetMapping("/actual/{idUsuario}")
-    public ResponseEntity<CajaSesionDTO> obtenerCajaActual(@PathVariable Integer idUsuario) {
-        return ResponseEntity.ok(cajaSesionService.obtenerCajaActual(idUsuario));
+   @GetMapping("/actual/{idUsuario}")
+public ResponseEntity<CajaSesionDTO> obtenerCajaActual(
+        @PathVariable Integer idUsuario
+) {
+
+    CajaSesionDTO caja =
+            cajaSesionService.obtenerCajaActual(idUsuario);
+
+    if (caja == null) {
+        return ResponseEntity.noContent().build();
     }
+
+    return ResponseEntity.ok(caja);
+}
 }

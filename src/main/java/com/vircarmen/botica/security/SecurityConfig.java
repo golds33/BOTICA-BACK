@@ -40,20 +40,42 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Login público
-                .anyRequest().authenticated() // El resto protegido
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Agregamos el filtro correcto a la cadena
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        return http.build();
-    }
+    http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+        .csrf(csrf -> csrf.disable())
+
+        .authorizeHttpRequests(auth -> auth
+
+            // Login y demás endpoints de autenticación son públicos
+            .requestMatchers(
+                    "/api/auth/**",
+                    "/error"
+            ).permitAll()
+
+            // Preflight CORS
+            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**")
+            .permitAll()
+
+            // Todo lo demás requiere autenticación
+            .anyRequest().authenticated()
+        )
+
+        .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS
+                )
+        )
+
+        .addFilterBefore(
+                jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class
+        );
+
+    return http.build();
+}
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
