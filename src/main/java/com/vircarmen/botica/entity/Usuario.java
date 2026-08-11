@@ -1,12 +1,27 @@
 package com.vircarmen.botica.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "usuarios")
-public class Usuario {
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +37,7 @@ public class Usuario {
     @Column(name = "password_hash", length = 255, nullable = false)
     private String passwordHash;
 
+    // AQUÍ USA TU ENUM ORIGINAL INTACTO
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Rol rol;
@@ -47,4 +63,38 @@ public class Usuario {
     public void setEstado(EstadoGeneral estado) { this.estado = estado; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+
+
+    // === LA MAGIA DE SPRING SECURITY ===
+    
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Extraemos tu Enum "ADMIN" y le sumamos "ROLE_" para formar "ROLE_ADMIN" en memoria
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.rol.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.passwordHash;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.estado == EstadoGeneral.A;
+    }
 }

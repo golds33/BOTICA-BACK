@@ -1,7 +1,7 @@
-package com.vircarmen.botica.entity;
+    package com.vircarmen.botica.entity;
 
-public enum Rol {
-    ADMIN,
-    CAJERO,
-    ALMACENERO
-}
+    public enum Rol {
+        ADMIN,
+        CAJERO,
+        ALMACENERO
+    }

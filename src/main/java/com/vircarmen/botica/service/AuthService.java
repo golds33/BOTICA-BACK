@@ -1,18 +1,20 @@
 package com.vircarmen.botica.service;
 
-import com.vircarmen.botica.dto.AuthRequest;
-import com.vircarmen.botica.dto.AuthResponse;
-import com.vircarmen.botica.entity.Usuario;
-import com.vircarmen.botica.repository.UsuarioRepository;
-import com.vircarmen.botica.security.JwtService;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import com.vircarmen.botica.dto.AuthRequest;
+import com.vircarmen.botica.dto.AuthResponse;
+import com.vircarmen.botica.entity.Usuario;
+import com.vircarmen.botica.repository.UsuarioRepository;
+import com.vircarmen.botica.security.JwtService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +44,7 @@ public class AuthService {
         return new AuthResponse(
                 token,
                 usuario.getUsername(),
+                usuario.getIdUsuario(),
                 usuario.getNombreCompleto(),
                 usuario.getRol().name()
         );

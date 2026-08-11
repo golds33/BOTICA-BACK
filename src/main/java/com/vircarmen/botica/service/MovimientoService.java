@@ -24,6 +24,7 @@ public class MovimientoService {
     private final DetalleMovimientoRepository detalleMovimientoRepository;
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final com.vircarmen.botica.repository.LoteRepository loteRepository;
 
     @Transactional
     public void registrarIngresoAlmacen(Integer idProducto, Integer cantidad, String motivo, Integer idUsuario) {
@@ -51,5 +52,13 @@ public class MovimientoService {
 
         producto.setStockActual(producto.getStockActual() + cantidad);
         productoRepository.save(producto);
+
+        // CREAR LOTE AUTOMÁTICO PARA EVITAR CRASH EN VENTAS (FEFO)
+        com.vircarmen.botica.entity.Lote lote = new com.vircarmen.botica.entity.Lote();
+        lote.setCodigoLote("LOTE-AUT-" + System.currentTimeMillis());
+        lote.setFechaVencimiento(java.time.LocalDate.now().plusYears(2));
+        lote.setCantidadLote(cantidad);
+        lote.setProducto(producto);
+        loteRepository.save(lote);
     }
-}
+}
